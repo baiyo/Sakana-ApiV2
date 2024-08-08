@@ -1,5 +1,7 @@
 const axios = require('axios');
+const cheerio = require('cheerio');
 
+const BASE_URL = 'https://gogoanime3.co';
 const consumetapivid = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/watch/';
 const consumetapirecent = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/recent-episodes';
 
@@ -29,9 +31,24 @@ let scrapeAnimeVideoFile = async ({ id }) => {
 
 let scrapeRecentPage = async ({}) => {
   try {
+    const list = []
     // const url = `${consumetapirecent}`
-    const { data } = await axios.get(consumetapirecent, { params: { page: 1, type: 1 } });
-    return data;
+    const mainPage = await axios.get(`${BASE_URL}`);
+  const $ = cheerio.load(mainPage.data);
+
+  $('div.last_episodes.loaddub > ul > li').each((i, el) => {
+    list.push({
+      animeId: $(el).find('p.name > a').attr('href').split('/')[1].split('-episode-')[0],
+      episodeId: $(el).find('p.name > a').attr('href').split('/')[1],
+      name: $(el).find('p.name > a').attr('title'),
+      episodeNum: $(el).find('p.episode').text().replace('Episode ', '').trim(),
+      subOrDub: $(el).find('div > a > div').attr('class').replace('type ic-', ''),
+      imgUrl: $(el).find('div > a > img').attr('src')
+    });
+  });
+
+  console.log(list)
+  return list
 
   } catch (err) {
     console.log(err);
