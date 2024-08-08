@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 
-
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
@@ -11,16 +10,14 @@ const corsOptions = {
   port: port,
 };
 
-const logRequest = (req, res, next) => {
-    console.log(`Received a ${req.method} request from ${req.ip}`);
-    next();
-};
+
+const extractor = require('./extractor.js')
+
 
 const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(logRequest);
 
 
 app.get('/', (req, res) => {
@@ -30,3 +27,21 @@ app.get('/', (req, res) => {
 app.listen(3000, () => {
     console.log('Server started on http://localhost:3000');
 });
+
+
+app.get('/getVideo/:id', async (req, res) => {
+    try {
+      console.log("received");
+      const id = req.params.id;
+  
+      const data = await extractor.scrapeAnimeVideoFile({ id: id });
+  
+      res.status(200).json(data);
+    } catch (err) {
+      res.status(500).json({
+        status: 500,
+        error: 'Internal Error',
+        message: err,
+      });
+    }
+  });
