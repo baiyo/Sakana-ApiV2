@@ -28,6 +28,19 @@ app.listen(3000, () => {
     console.log('Server started on http://localhost:3000');
 });
 
+app.get('/getRecentAnime', async (req,res) => {
+  try {
+    const data = await extractor.scrapeRecentPage({});
+    res.status(200).json(data);
+
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      error: 'Internal Error',
+      message: err,
+    });
+  }
+});
 
 app.get('/getVideo/:id', async (req, res) => {
     try {
