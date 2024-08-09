@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
+const chromium = require('chromium');
+
 
 const BASE_URL = 'https://gogoanime3.co';
 const consumetapivid = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/watch/';
@@ -61,17 +63,26 @@ let scrapeAnimeDetails = async ({ id }) => {
   try {
     let genres = [];
     let epList = [];
+    const chromiumExecutablePath = chromium.path;
+
 
     // const animePageTest = await axios.get(`${BASE_URL}/category/${id}`);
     // const animePageTest = await axios.get(`https://ww8.gogoanimes.org/category/${id}`);
+
     // const $ = cheerio.load(animePageTest.data);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true,
+      executablePath: chromiumExecutablePath
+    });
     const page = await browser.newPage();
     await page.goto(`${BASE_URL}/category/${id}`, { waitUntil: 'networkidle2' });
 
+
     const content = await page.content();
     const $ = cheerio.load(content);
+    await browser.close();
+
 
     const animeTitle = $('div.anime_info_body_bg > h1').text();
     const animeImage = $('div.anime_info_body_bg > img').attr('src');
