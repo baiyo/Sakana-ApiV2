@@ -58,4 +58,21 @@ app.get('/getVideo/:id', async (req, res) => {
         message: err,
       });
     }
-  });
+});
+
+app.get('/getAnimeDetails/:id', async (req, res) => {
+  try {
+    console.log("received");
+    const id = req.params.id;
+
+    const data = await extractor.scrapeAnimeDetails({ id: id });
+
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      error: 'Internal Error',
+      message: err,
+    });
+  }
+});

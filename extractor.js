@@ -56,7 +56,93 @@ let scrapeRecentPage = async ({}) => {
   }
 };
 
+let scrapeAnimeDetails = async ({ id }) => {
+  try {
+    let genres = [];
+    let epList = [];
+
+    const animePageTest = await axios.get(`${BASE_URL}/category/${id}`);
+
+    const $ = cheerio.load(animePageTest.data);
+
+    const animeTitle = $('div.anime_info_body_bg > h1').text();
+    const animeImage = $('div.anime_info_body_bg > img').attr('src');
+    const type = $('div.anime_info_body_bg > p:nth-child(4) > a').text();
+    const desc = $('div.anime_info_body_bg > p:nth-child(6)')
+      .text()
+      .replace('Plot Summary: ', '');
+    const releasedDate = $('div.anime_info_body_bg > p:nth-child(8)')
+      .text()
+      .replace('Released: ', '');
+    const status = $('div.anime_info_body_bg > p:nth-child(9) > a').text();
+    const otherName = $('div.anime_info_body_bg > p:nth-child(10)')
+      .text()
+      .replace('Other name: ', '')
+      .replace(/;/g, ',');
+
+    $('div.anime_info_body_bg > p:nth-child(7) > a').each((i, elem) => {
+      genres.push($(elem).attr('title').trim());
+    });
+
+    const ep_start = $('#episode_page > li').first().find('a').attr('ep_start');
+    const ep_end = $('#episode_page > li').last().find('a').attr('ep_end');
+    const movie_id = $('#movie_id').attr('value');
+    const alias = $('#alias_anime').attr('value');
+    const episode_info_html = $('div.anime_info_episodes_next').html();
+    const episode_page = $('ul#episode_page').html();
+    // console.log(episode_page);
+
+    // console.log(movie_id);
+    // console.log("--------------");
+    // console.log(ep_start);
+    // console.log("--------------");
+    // console.log(ep_end);
+    // console.log("--------------");
+    // console.log(alias);
+    // console.log("------END--------");
+
+    // console.log($$.children());
+    
+    // console.log($('ul#episode_related'));
+
+    // console.log($)
+
+    const episodeRelated = $('#episode_related > li');
+
+    console.log(episodeRelated.length);
+
+    episodeRelated.each((i, el) => {
+      epList.push({
+        episodeId: $(el).find('a').attr('href').split('/')[1],
+        episodeNum: $(el).find(`div.name`).text().replace('EP ', ''),
+      });
+    });
+
+    console.log(epList.reverse());
+
+    return {
+      name: animeTitle.toString(),
+      type: type.toString(),
+      released: releasedDate.toString(),
+      status: status.toString(),
+      genres: genres,
+      othername: otherName,
+      synopsis: desc.toString(),
+      imageUrl: animeImage.toString(),
+      totalEpisodes: ep_end,
+      episode_id: epList.reverse(),
+      episode_info_html: episode_info_html.trim(),
+      episode_page: episode_page.toString().trim(),
+    };
+  } catch (err) {
+    console.log(err);
+    return { error: err };
+  }
+};
+
+
 module.exports = { 
   scrapeAnimeVideoFile,
-  scrapeRecentPage
+  scrapeRecentPage,
+  scrapeAnimeDetails,
 } 
