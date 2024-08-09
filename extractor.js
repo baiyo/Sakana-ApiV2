@@ -1,9 +1,10 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
 // const chromium = require('chromium');
 
-
+const ajax = 'https://ajax.gogocdn.net/';
+const list_episodes_url = 'https://ajax.gogocdn.net/ajax/load-list-episode'
 const BASE_URL = 'https://gogoanime3.co';
 const consumetapivid = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/watch/';
 const consumetapirecent = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/recent-episodes';
@@ -63,7 +64,6 @@ let scrapeAnimeDetails = async ({ id }) => {
   try {
     let genres = [];
     let epList = [];
-    const chromiumExecutablePath = chromium.path;
 
 
     const animePageTest = await axios.get(`${BASE_URL}/category/${id}`);
@@ -112,6 +112,11 @@ let scrapeAnimeDetails = async ({ id }) => {
     // const loadEp = $('#load_ep');
     // const episodeRelated = loadEp.find('#episode_related');
 
+    const html = await axios.get(
+      `${list_episodes_url}?ep_start=${ep_start}&ep_end=${ep_end}&id=${movie_id}&default_ep=${0}&alias=${alias}`
+    );
+    const $$ = cheerio.load(html.data);
+
     // console.log(episodeRelated.length);
     // console.log(episodeRelated.html());
     // console.log();
@@ -132,7 +137,7 @@ let scrapeAnimeDetails = async ({ id }) => {
 
     // console.log($)
 
-    const episodeRelated = $('ul#episode_related > li');
+    const episodeRelated = $$('ul#episode_related > li');
 
     // console.log(episodeRelated.length);
 
