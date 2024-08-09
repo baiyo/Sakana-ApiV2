@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 
 const BASE_URL = 'https://gogoanime3.co';
 const consumetapivid = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/watch/';
@@ -61,9 +62,16 @@ let scrapeAnimeDetails = async ({ id }) => {
     let genres = [];
     let epList = [];
 
-    const animePageTest = await axios.get(`${BASE_URL}/category/${id}`);
+    // const animePageTest = await axios.get(`${BASE_URL}/category/${id}`);
+    // const animePageTest = await axios.get(`https://ww8.gogoanimes.org/category/${id}`);
+    // const $ = cheerio.load(animePageTest.data);
 
-    const $ = cheerio.load(animePageTest.data);
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(`${BASE_URL}/category/${id}`, { waitUntil: 'networkidle2' });
+
+    const content = await page.content();
+    const $ = cheerio.load(content);
 
     const animeTitle = $('div.anime_info_body_bg > h1').text();
     const animeImage = $('div.anime_info_body_bg > img').attr('src');
@@ -90,6 +98,12 @@ let scrapeAnimeDetails = async ({ id }) => {
     const alias = $('#alias_anime').attr('value');
     const episode_info_html = $('div.anime_info_episodes_next').html();
     const episode_page = $('ul#episode_page').html();
+    // const loadEp = $('#load_ep');
+    // const episodeRelated = loadEp.find('#episode_related');
+
+    // console.log(episodeRelated.length);
+    // console.log(episodeRelated.html());
+    // console.log();
     // console.log(episode_page);
 
     // console.log(movie_id);
@@ -107,9 +121,9 @@ let scrapeAnimeDetails = async ({ id }) => {
 
     // console.log($)
 
-    const episodeRelated = $('#episode_related > li');
+    const episodeRelated = $('ul#episode_related > li');
 
-    console.log(episodeRelated.length);
+    // console.log(episodeRelated.length);
 
     episodeRelated.each((i, el) => {
       epList.push({
@@ -119,6 +133,7 @@ let scrapeAnimeDetails = async ({ id }) => {
     });
 
     console.log(epList.reverse());
+    
 
     return {
       name: animeTitle.toString(),
