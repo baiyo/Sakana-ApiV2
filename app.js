@@ -21,7 +21,7 @@ app.use(express.json());
 
 
 app.get('/', (req, res) => {
-  res.status(200).json('Sakana Api V2 is running');
+  res.status(200).json('Sakana Api V2 is running 🤙🤟');
 });
 
 app.listen(3000, () => {
@@ -31,6 +31,7 @@ app.listen(3000, () => {
 app.get('/getRecentAnime', async (req,res) => {
   try {
     const data = await extractor.scrapeRecentPage({});
+    console.log(data);
     res.status(200).json(data);
 
   } catch (err) {
