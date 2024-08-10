@@ -131,11 +131,6 @@ let scrapeAnimeDetails = async ({ id }) => {
     // console.log(alias);
     // console.log("------END--------");
 
-    // console.log($$.children());
-    
-    // console.log($('ul#episode_related'));
-
-    // console.log($)
 
     const episodeRelated = $$('ul#episode_related > li');
 
@@ -171,9 +166,62 @@ let scrapeAnimeDetails = async ({ id }) => {
   }
 };
 
+let scrapeWatchAnime = async ({ id }) => {
+  try {
+    let genres = [];
+    let epList = [];
+
+    console.log(id);
+    const WatchAnime = await axios.get(`https://${BASE_URL}/${id}`);
+    const $ = cheerio.load(WatchAnime.data);
+
+    const anime_category = $('div.anime-info a').attr('href').replace('/category/', '')
+    const episode_page = $('ul#episode_page').html();
+    const movie_id = $('#movie_id').attr('value');
+    const alias = $('#alias_anime').attr('value');
+    const episode_link = $('div.play-video > iframe').attr('src');
+    const gogoserver = $('li.vidcdn > a').attr('data-video');
+    const streamsb = $('li.streamsb > a').attr('data-video');
+    const xstreamcdn = $('li.xstreamcdn > a').attr('data-video');
+    const anime_name_with_ep = $('div.title_name h2').text();
+    const ep_num = $('div.anime_video_body > input.default_ep').attr('value');
+    const download = $('li.dowloads a').attr('href');
+    const nextEpText = $('div.anime_video_body_episodes_r a').text();
+    const nextEpLink = $('div.anime_video_body_episodes_r > a').attr('href');
+    const prevEpText = $('div.anime_video_body_episodes_l a').text();
+    const prevEpLink = $('div.anime_video_body_episodes_l > a').attr('href');
+
+    console.log(episode_link);
+
+
+    console.log("returning");
+    return {
+      video: episode_link,
+      gogoserver: gogoserver,
+      streamsb: streamsb,
+      xstreamcdn: xstreamcdn,
+      animeNameWithEP: anime_name_with_ep.toString(),
+      ep_num: ep_num,
+      ep_download: download,
+      anime_info: anime_category,
+      movie_id: movie_id,
+      alias: alias,
+      episode_page: episode_page,
+      nextEpText: nextEpText,
+      nextEpLink: nextEpLink,
+      prevEpLink: prevEpLink,
+      prevEpText: prevEpText,
+    };
+    console.log("returned");
+  } catch (err) {
+    console.log(err);
+    return { error: err };
+  }
+};
 
 module.exports = { 
   scrapeAnimeVideoFile,
   scrapeRecentPage,
   scrapeAnimeDetails,
+  scrapeWatchAnime,
 } 

@@ -76,3 +76,20 @@ app.get('/getAnimeDetails/:id', async (req, res) => {
     });
   }
 });
+
+app.get('/getWatchPage/:id', async (req, res) => {
+  try {
+    console.log("received");
+    const id = req.params.id;
+
+    const data = await extractor.scrapeWatchAnime({ id: id });
+
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      error: 'Internal Error',
+      message: err,
+    });
+  }
+});
