@@ -172,7 +172,7 @@ let scrapeWatchAnime = async ({ id }) => {
     let epList = [];
 
     console.log(id);
-    const WatchAnime = await axios.get(`https://${BASE_URL}/${id}`);
+    const WatchAnime = await axios.get(`${BASE_URL}/${id}`);
     const $ = cheerio.load(WatchAnime.data);
 
     const anime_category = $('div.anime-info a').attr('href').replace('/category/', '')
