@@ -7,11 +7,10 @@ const ajax = 'https://ajax.gogocdn.net/';
 const list_episodes_url = 'https://ajax.gogocdn.net/ajax/load-list-episode'
 const BASE_URL = 'https://gogoanime3.co';
 const consumetapivid = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/watch/';
-const consumetapirecent = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/recent-episodes';
+const search_path = '/search.html';
 
 let scrapeAnimeVideoFile = async ({ id }) => {
     try {
-      console.log('hey');
       const url = `${consumetapivid}${id}`;
       // console.log(url);
       // i have no fucking clue of what i did here but it fucking works
@@ -219,9 +218,33 @@ let scrapeWatchAnime = async ({ id }) => {
   }
 };
 
+let scrapeSearchResults = async ({ list = [], keyw, page = 1  }) => {
+  try {
+    const searchPage = await axios.get(
+      `${BASE_URL + search_path}?keyword=${keyw}&page=${page}`
+    );
+    const $ = cheerio.load(searchPage.data);
+
+    $('div.last_episodes > ul > li').each((i, el) => {
+      list.push({
+        anime_id: $(el).find('p.name > a').attr('href').split('/')[2],
+        name: $(el).find('p.name > a').attr('title'),
+        img_url: $(el).find('div > a > img').attr('src'),
+        status: $(el).find('p.released').text().trim(),
+      });
+    });
+
+    return list;
+  } catch (err) {
+    console.log(err);
+    return { error: err };
+  }
+};
+
 module.exports = { 
   scrapeAnimeVideoFile,
   scrapeRecentPage,
   scrapeAnimeDetails,
   scrapeWatchAnime,
+  scrapeSearchResults
 } 

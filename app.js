@@ -93,3 +93,20 @@ app.get('/getWatchPage/:id', async (req, res) => {
     });
   }
 });
+
+app.get('/search', async (req, res) => {
+  try {
+    const keyw = req.query.keyw;
+    const page = req.query.page;
+
+    const data = await extractor.scrapeSearchResults({ keyw: keyw, page: page });
+
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      error: 'Internal Error',
+      message: err,
+    });
+  }
+});
