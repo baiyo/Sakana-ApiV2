@@ -1,29 +1,20 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-// const puppeteer = require('puppeteer');
-// const chromium = require('chromium');
 
 const ajax = 'https://ajax.gogocdn.net/';
 const list_episodes_url = 'https://ajax.gogocdn.net/ajax/load-list-episode'
 const BASE_URL = 'https://gogoanime3.co';
-const consumetapivid = 'https://consumet-api-cw2f.onrender.com/anime/gogoanime/watch/';
+const consumetapivid = ''; // Put consumet api here
 const search_path = '/search.html';
 
 let scrapeAnimeVideoFile = async ({ id }) => {
     try {
       const url = `${consumetapivid}${id}`;
-      // console.log(url);
-      // i have no fucking clue of what i did here but it fucking works
       const data = await axios.get(url, { params: { server: "gogocdn" } });
   
   
-      // console.log(data);
   
       let GetBest = data['data']['sources'].length
-  
-      // console.log(data['data']['sources']);
-      // console.log(data['data']['sources'][GetBest - 2]['url']);
-      // Gets the default source i think
       return {video: data['data']['sources'][GetBest - 2]['url']};
   
     } catch (err) {
@@ -108,32 +99,15 @@ let scrapeAnimeDetails = async ({ id }) => {
     const alias = $('#alias_anime').attr('value');
     const episode_info_html = $('div.anime_info_episodes_next').html();
     const episode_page = $('ul#episode_page').html();
-    // const loadEp = $('#load_ep');
-    // const episodeRelated = loadEp.find('#episode_related');
 
     const html = await axios.get(
       `${list_episodes_url}?ep_start=${ep_start}&ep_end=${ep_end}&id=${movie_id}&default_ep=${0}&alias=${alias}`
     );
     const $$ = cheerio.load(html.data);
 
-    // console.log(episodeRelated.length);
-    // console.log(episodeRelated.html());
-    // console.log();
-    // console.log(episode_page);
-
-    // console.log(movie_id);
-    // console.log("--------------");
-    // console.log(ep_start);
-    // console.log("--------------");
-    // console.log(ep_end);
-    // console.log("--------------");
-    // console.log(alias);
-    // console.log("------END--------");
-
 
     const episodeRelated = $$('ul#episode_related > li');
 
-    // console.log(episodeRelated.length);
 
     episodeRelated.each((i, el) => {
       epList.push({
