@@ -26,7 +26,6 @@ let scrapeAnimeVideoFile = async ({ id }) => {
 let scrapeRecentPage = async ({}) => {
   try {
     const list = []
-    // const url = `${consumetapirecent}`
     const mainPage = await axios.get(`${BASE_URL}`);
   const $ = cheerio.load(mainPage.data);
 
@@ -57,21 +56,8 @@ let scrapeAnimeDetails = async ({ id }) => {
 
 
     const animePageTest = await axios.get(`${BASE_URL}/category/${id}`);
-    // const animePageTest = await axios.get(`https://ww8.gogoanimes.org/category/${id}`);
 
     const $ = cheerio.load(animePageTest.data);
-
-    // const browser = await puppeteer.launch({
-    //   headless: true,
-    //   executablePath: chromiumExecutablePath
-    // });
-    // const page = await browser.newPage();
-    // await page.goto(`${BASE_URL}/category/${id}`, { waitUntil: 'networkidle2' });
-
-
-    // const content = await page.content();
-    // const $ = cheerio.load(content);
-    // await browser.close();
 
 
     const animeTitle = $('div.anime_info_body_bg > h1').text();
